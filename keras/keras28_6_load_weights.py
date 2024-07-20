@@ -4,7 +4,7 @@ print(sk.__version__) # 0.24.2
 
 import numpy as np
 
-from keras.models import Sequential, load_model
+from keras.models import Sequential
 from keras.layers import Dense
 
 from sklearn.model_selection import train_test_split
