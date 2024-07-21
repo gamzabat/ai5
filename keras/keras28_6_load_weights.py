@@ -14,11 +14,6 @@ from sklearn.preprocessing import RobustScaler
 
 from sklearn.datasets import load_boston
 
-import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
-
-import time
-
 # data
 dataset = load_boston()
 
