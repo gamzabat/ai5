@@ -1,7 +1,7 @@
 import numpy as np
 
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.layers import Dense
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 from sklearn.preprocessing import MinMaxScaler
