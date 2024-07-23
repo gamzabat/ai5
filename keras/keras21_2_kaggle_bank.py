@@ -10,45 +10,27 @@ from keras.layers import Dense
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import LabelEncoder
 
 from keras.callbacks import EarlyStopping
-
-import matplotlib.pyplot as plt
 
 import time
 
 PATH = "./_data/kaggle/playground-series-s4e1/" # 상대경로
 
-#0 replace data
-# train_csv = pd.read_csv(PATH + "train.csv", index_col = 0)
+le = LabelEncoder()
 
-# print(train_csv['Geography'].value_counts())
+train_csv = pd.read_csv(PATH + "train.csv", index_col = 0)
 
-# train_csv['Geography'] = train_csv['Geography'].replace('France', value = 1)
-# train_csv['Geography'] = train_csv['Geography'].replace('Spain', value = 2)
-# train_csv['Geography'] = train_csv['Geography'].replace('Germany', value = 3)
-
-# train_csv['Gender'] = train_csv['Gender'].replace('Male', value = 1)
-# train_csv['Gender'] = train_csv['Gender'].replace('Female', value = 2)
-
-# train_csv.to_csv(PATH + "replaced_train.csv")
-
-# test_csv = pd.read_csv(PATH + "test.csv", index_col = 0)
-
-# test_csv['Geography'] = test_csv['Geography'].replace('France', value = 1)
-# test_csv['Geography'] = test_csv['Geography'].replace('Spain', value = 2)
-# test_csv['Geography'] = test_csv['Geography'].replace('Germany', value = 3)
-
-# test_csv['Gender'] = test_csv['Gender'].replace('Male', value = 1)
-# test_csv['Gender'] = test_csv['Gender'].replace('Female', value = 2)
-
-# test_csv.to_csv(PATH + "replaced_test.csv")
-
-train_csv = pd.read_csv(PATH + "replaced_train.csv", index_col = 0)
+train_csv['Geography'] = le.fit_transform(train_csv['Geography'])
+train_csv['Gender'] = le.fit_transform(train_csv['Gender'])
 
 print(train_csv) # [165034 rows x 13 columns]
 
-test_csv = pd.read_csv(PATH + "replaced_test.csv", index_col = 0)
+test_csv = pd.read_csv(PATH + "test.csv", index_col = 0)
+
+test_csv['Geography'] = le.fit_transform(test_csv['Geography'])
+test_csv['Gender'] = le.fit_transform(test_csv['Gender'])
 
 print(test_csv) # [110023 rows x 12 columns]
 
@@ -66,38 +48,11 @@ test_csv = test_csv.drop(['CustomerId', 'Surname'], axis = 1)
 
 test_csv.info()
 
-###############################################
-from sklearn.preprocessing import MinMaxScaler
-
-train_scaler = MinMaxScaler()
-
-train_csv_copy = train_csv.copy()
-
-train_csv_copy = train_csv_copy.drop(['Exited'], axis = 1)
-
-train_scaler.fit(train_csv_copy)
-
-train_csv_scaled = train_scaler.transform(train_csv_copy)
-
-train_csv = pd.concat([pd.DataFrame(data = train_csv_scaled), train_csv['Exited']], axis = 1)
-
-test_scaler = MinMaxScaler()
-
-test_csv_copy = test_csv.copy()
-
-test_scaler.fit(test_csv_copy)
-
-test_csv_scaled = test_scaler.transform(test_csv_copy)
-
-test_csv = pd.DataFrame(data = test_csv_scaled)
-###############################################
 x = train_csv.drop(['Exited'], axis = 1)
 
 y = train_csv['Exited']
 
 print(y.value_counts())
-
-input()
 
 x_train, x_test, y_train, y_test = train_test_split(
     x,
@@ -109,15 +64,7 @@ x_train, x_test, y_train, y_test = train_test_split(
 #2 model
 model = Sequential()
 
-model.add(Dense(32, input_dim = 10, activation = 'relu'))
-
-model.add(Dense(32, activation = 'relu'))
-model.add(Dense(32, activation = 'relu'))
-model.add(Dense(32, activation = 'relu'))
-model.add(Dense(16, activation = 'relu'))
-model.add(Dense(16, activation = 'relu'))
-model.add(Dense(16, activation = 'relu'))
-
+model.add(Dense(16, input_dim = 10, activation = 'relu'))
 model.add(Dense(1, activation = 'sigmoid'))
 
 #3 compile
@@ -160,3 +107,13 @@ y_submit = model.predict(test_csv)
 submission_csv['Exited'] = np.round(y_submit)
 
 submission_csv.to_csv(PATH + "sample_submission_0723.csv")
+
+# acc : 0.8621504529342261
+# acc : 0.8623019359529797
+
+# acc : 0.861726300481716
+# acc : 0.8622716393492289
+# acc : 0.8626654951979883
+# acc : 0.8630896476504983
+# acc : 0.8633320204805042
+# acc : 0.8633926136880056

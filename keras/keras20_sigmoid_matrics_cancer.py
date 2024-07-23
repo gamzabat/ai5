@@ -66,7 +66,7 @@ model.add(Dense(16, activation = 'relu'))
 model.add(Dense(1, activation = 'sigmoid'))
 
 #3 compile
-model.compile(loss = 'mse', optimizer = 'adam', metrics = ['accuracy'])
+model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
 
 start_time = time.time()
 
@@ -98,3 +98,18 @@ print(y_pred[:30])
 print(np.round(y_pred[:30]))
 
 print("acc :", accuracy_score(y_test, np.round(y_pred)))
+
+# ------------------------
+# mse
+# ------------------------
+# acc : 0.9415204678362573
+# acc : 0.9532163742690059
+# ------------------------
+# binary_crossentropy
+# ------------------------
+# acc : 0.9239766081871345
+# acc : 0.935672514619883
+# acc : 0.9415204678362573
+# acc : 0.9473684210526315
+# acc : 0.9590643274853801
+# acc : 0.9649122807017544

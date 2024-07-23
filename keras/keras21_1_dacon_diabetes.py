@@ -48,8 +48,6 @@ print(train_csv['Glucose'].value_counts())
 
 print(train_csv.shape)
 
-input()
-
 train_csv.info()
 
 x = train_csv.drop(['Outcome'], axis = 1)
@@ -80,14 +78,14 @@ model.add(Dense(16, activation = 'relu'))
 model.add(Dense(1, activation = 'sigmoid'))
 
 #3 compile
-model.compile(loss = 'mse', optimizer = 'adam', metrics = ['accuracy'])
+model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
 
 start_time = time.time()
 
 es = EarlyStopping( 
     monitor = 'val_loss',
     mode = 'min',
-    patience = 64,
+    patience = 50,
     restore_best_weights = True
 )
 
@@ -119,3 +117,18 @@ y_submit = model.predict(test_csv)
 submission_csv['Outcome'] = np.round(y_submit)
 
 submission_csv.to_csv(PATH + "sample_submission_0722.csv")
+
+# ------------------------
+# mse
+# ------------------------
+# acc : 0.6935483870967742
+# acc : 0.7661290322580645
+# acc : 0.7741935483870968
+# ------------------------
+# binary_crossentropy
+# ------------------------
+# acc : 0.6935483870967742
+# acc : 0.7016129032258065
+# acc : 0.7258064516129032
+# acc : 0.7741935483870968
+# acc : 0.7903225806451613
