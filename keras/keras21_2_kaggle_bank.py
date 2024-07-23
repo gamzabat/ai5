@@ -58,7 +58,7 @@ x_train, x_test, y_train, y_test = train_test_split(
     x,
     y,
     train_size = 0.80,
-    random_state = 1186
+    random_state = 7777
 )
 
 #2 model
