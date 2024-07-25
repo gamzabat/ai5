@@ -3,13 +3,14 @@
 import numpy as np
 import pandas as pd
 
-import tensorflow as tf
-
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.callbacks import EarlyStopping
 
 from sklearn.preprocessing import LabelEncoder
+
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.preprocessing import MaxAbsScaler, RobustScaler
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
@@ -48,25 +49,43 @@ x_train, x_test, y_train, y_test = train_test_split(
     stratify = y
 )
 
+# min_max_scaler = MinMaxScaler()
+
+# min_max_scaler.fit(x_train)
+
+# x_train = min_max_scaler.transform(x_train)
+# x_test = min_max_scaler.transform(x_test)
+# test_csv = min_max_scaler.transform(test_csv)
+
+# standard_scaler = StandardScaler().fit(x_train)
+
+# x_train = standard_scaler.transform(x_train)
+# x_test = standard_scaler.transform(x_test)
+# test_csv = standard_scaler.transform(test_csv)
+
+# max_abs_scaler = MaxAbsScaler().fit(x_train)
+
+# x_train = max_abs_scaler.transform(x_train)
+# x_test = max_abs_scaler.transform(x_test)
+# test_csv = max_abs_scaler.transform(test_csv)
+
+robust_scaler = RobustScaler().fit(x_train)
+
+x_train = robust_scaler.transform(x_train)
+x_test = robust_scaler.transform(x_test)
+test_csv = robust_scaler.transform(test_csv)
+
+#3 model
 model = Sequential()
 
 model.add(Dense(128, input_dim = 93, activation = 'relu'))
 
 model.add(Dense(128, activation = 'relu'))
 model.add(Dense(128, activation = 'relu'))
-model.add(Dense(128, activation = 'relu'))
-model.add(Dense(128, activation = 'relu'))
-model.add(Dense(128, activation = 'relu'))
 
 model.add(Dense(64, activation = 'relu'))
 model.add(Dense(64, activation = 'relu'))
-model.add(Dense(64, activation = 'relu'))
-model.add(Dense(64, activation = 'relu'))
-model.add(Dense(64, activation = 'relu'))
 
-model.add(Dense(32, activation = 'relu'))
-model.add(Dense(32, activation = 'relu'))
-model.add(Dense(32, activation = 'relu'))
 model.add(Dense(32, activation = 'relu'))
 model.add(Dense(32, activation = 'relu'))
 
@@ -90,7 +109,7 @@ model.fit(
     validation_split = 0.25,
     callbacks = [es],
     epochs = 5120,
-    batch_size = 1024,
+    batch_size = 256,
     verbose = 2
 )
 
@@ -108,7 +127,7 @@ y_pred = model.predict(x_test)
 print("loss :", loss)
 print("acc :", accuracy_score(y_test, np.round(y_pred)))
 
-y_submit = model.predict(test_csv)
+y_submit = np.round(model.predict(test_csv), 1)
 
 print(y_submit[:10])
 
@@ -116,3 +135,23 @@ for i in range(9):
     sample_submission_csv['Class_' + str(i + 1)] = y_submit[:, i]
 
 sample_submission_csv.to_csv(PATH + "sampleSubmission_0725.csv")
+
+# before scaler
+# loss : [0.5735519528388977, 0.7898351550102234]
+# acc : 0.7520200387847447
+
+# after minMaxScaler
+# loss : [0.5461804270744324, 0.7933904528617859]
+# acc : 0.7529896574014221
+
+# after standardScaler
+# loss : [0.5280560255050659, 0.8011474013328552]
+# acc : 0.7657563025210085
+
+# after minAbsScaler
+# loss : [0.5290956497192383, 0.7955721020698547]
+# acc : 0.7580801551389786
+
+# after robustScaler
+# loss : [0.5230527520179749, 0.8013089895248413]
+# acc : 0.7622010342598577
