@@ -7,10 +7,14 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.callbacks import EarlyStopping
 
+#from tensorflow.keras.utils import to_categorical
+
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 import time
+
+from sklearn.preprocessing import OneHotEncoder
 
 #1 data
 dataset = fetch_covtype()
@@ -19,15 +23,29 @@ x = pd.DataFrame(dataset.data).iloc[:, :13]
 
 y = pd.get_dummies(dataset.target)
 
-print(x)
-print(y)
+#y = pd.DataFrame(to_categorical(dataset.target))
+
+print(y.head())
+
+# y = OneHotEncoder(sparse = False).fit_transform(dataset.target.reshape(-1, 1))
+
+# print(x)
+# print(y.shape)
+
+# print(pd.DataFrame(y).value_counts())
 
 x_train, x_test, y_train, y_test = train_test_split(
     x,
     y,
     train_size = 0.9,
-    random_state = 3333
+    random_state = 42,
+    stratify = y
 )
+
+# print(x_train.shape, y_train.shape)
+# print(x_test.shape, y_test.shape)
+
+# print(pd.DataFrame(y_train).value_counts())
 
 #2 model
 model = Sequential()
@@ -56,7 +74,7 @@ start_time = time.time()
 es = EarlyStopping(
     monitor = 'val_loss',
     mode = 'min',
-    patience = 64,
+    patience = 32,
     restore_best_weights = True
 )
 
@@ -66,7 +84,7 @@ model.fit(
     validation_split = 0.3,
     callbacks = [es],
     epochs = 1000,
-    batch_size = 1024,
+    batch_size = 512,
     verbose = 1
 )
 
