@@ -15,14 +15,32 @@ from sklearn.preprocessing import MaxAbsScaler, RobustScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
+import matplotlib.pyplot as plt
+
 import time
 
 #1 data
-PATH = "C:/ai5/_data/kaggle/otto/" # 절대경로
+PATH = "./_data/kaggle/otto/" # 절대경로
 
 train_csv = pd.read_csv(PATH + "train.csv", index_col = 0)
 test_csv = pd.read_csv(PATH + "test.csv", index_col = 0)
 sample_submission_csv = pd.read_csv(PATH + "sampleSubmission.csv", index_col = 0)
+
+fig, axs = plt.subplots(4, 4)
+
+index = 0
+
+print(train_csv.iloc[:, index])
+
+for i in range(4):
+    for j in range(4):
+        train_csv.iloc[:, index].groupby(train_csv['target']).plot(ax = axs[i, j], y = train_csv.iloc[:, index])
+
+        index += 1
+
+plt.show()
+
+exit()
 
 x = train_csv.drop('target', axis = 1)
 #x = train_csv
@@ -127,7 +145,7 @@ y_pred = model.predict(x_test)
 print("loss :", loss)
 print("acc :", accuracy_score(y_test, np.round(y_pred)))
 
-y_submit = np.round(model.predict(test_csv), 1)
+y_submit = model.predict(test_csv)
 
 print(y_submit[:10])
 

@@ -16,7 +16,7 @@ from sklearn.metrics import accuracy_score
 import time
 
 #1 data
-PATH = "C:/ai5/_data/kaggle/santander/" # 절대경로
+PATH = "./_data/kaggle/santander/" # 절대경로
 
 train_csv = pd.read_csv(PATH + "train.csv", index_col = 0)
 test_csv = pd.read_csv(PATH + "test.csv", index_col = 0)

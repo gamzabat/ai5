@@ -5,7 +5,10 @@ import pandas as pd
 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.preprocessing import MaxAbsScaler, RobustScaler
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
@@ -21,22 +24,17 @@ sample_submission_csv = pd.read_csv(PATH + "sample_submission.csv", index_col = 
 
 x = train_csv.drop('target', axis = 1)
 
-#y = pd.get_dummies(train_csv['target'])
 y = train_csv['target']
-
-print(y)
-
-# print(train_csv.isna().sum())
-# print(test_csv.isna().sum())
 
 x_train, x_test, y_train, y_test = train_test_split(
     x,
     y,
     train_size = 0.95,
-    random_state = 6666,
+    random_state = 7777,
     stratify = y
 )
 
+#3 model
 model = Sequential()
 
 model.add(Dense(256, input_dim = 200, activation = 'relu'))
@@ -44,10 +42,6 @@ model.add(Dense(256, input_dim = 200, activation = 'relu'))
 model.add(Dense(256, activation = 'relu'))
 model.add(Dense(256, activation = 'relu'))
 model.add(Dense(256, activation = 'relu'))
-model.add(Dense(256, activation = 'relu'))
-model.add(Dense(256, activation = 'relu'))
-model.add(Dense(256, activation = 'relu'))
-model.add(Dense(128, activation = 'relu'))
 model.add(Dense(128, activation = 'relu'))
 model.add(Dense(128, activation = 'relu'))
 model.add(Dense(128, activation = 'relu'))
@@ -57,6 +51,31 @@ model.add(Dense(1, activation = 'sigmoid'))
 
 #3 compile
 model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
+
+##################### mcp 세이브 파일명 만들기 시작 ###################
+import datetime
+
+date = datetime.datetime.now()
+
+print(date) # 2024-07-26 16:49:36.336699
+print(type(date)) # <class 'datetime.datetime'>
+
+date = date.strftime("%y%m%d_%H%M%S") # 240726_165505
+
+PATH = './_save/keras30_mcp/12-kaggle-santander/'
+
+filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
+
+filepath = ''.join([PATH, 'k30_', date, "_", filename])
+##################### mcp 세이브 파일명 만들기 끝 ###################
+
+mcp = ModelCheckpoint(
+    monitor = 'val_loss',
+    mode = 'auto',
+    verbose = 1,
+    save_best_only = True,
+    filepath = filepath
+)
 
 start_time = time.time()
 
@@ -71,9 +90,9 @@ model.fit(
     x_train,
     y_train,
     validation_split = 0.1,
-    callbacks = [es],
+    callbacks = [es, mcp],
     epochs = 1000,
-    batch_size = 8196,
+    batch_size = 1024,
     verbose = 1
 )
 
@@ -88,14 +107,13 @@ y_pred = model.predict(x_test)
 
 print(np.round(y_pred[:10]))
 
+print("loss :", loss)
 print("acc :", accuracy_score(y_test, np.round(y_pred)))
 
 y_submit = model.predict(test_csv)
 
 print(y_submit[:10])
 
-print(np.round(y_submit[:, 1]))
+sample_submission_csv['target'] = np.round(y_submit).astype("int")
 
-sample_submission_csv['target'] = np.round(y_submit)
-
-sample_submission_csv.to_csv(PATH + "sample_submission_0724.csv")
+sample_submission_csv.to_csv(PATH + "sample_submission_0726.csv")

@@ -20,7 +20,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 
 #1 data
-PATH = "C:/ai5/_data/bike-sharing-demand/" # 절대경로
+PATH = "./_data/bike-sharing-demand/" # 절대경로
 
 train_csv = pd.read_csv(PATH + "train.csv", index_col = 0)
 test_csv = pd.read_csv(PATH + "test.csv", index_col = 0)

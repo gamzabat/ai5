@@ -19,7 +19,7 @@ from keras.callbacks import EarlyStopping
 import time
 
 #1 data
-PATH = "C:/ai5/_data/kaggle/bike-sharing-demand/" # 절대경로
+PATH = "./_data/kaggle/bike-sharing-demand/" # 절대경로
 
 train_csv = pd.read_csv(PATH + "train.csv", index_col = 0)
 test_csv = pd.read_csv(PATH + "test.csv", index_col = 0)
