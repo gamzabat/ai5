@@ -4,9 +4,6 @@ from keras.models import Sequential
 from keras.layers import Dense
 
 # data
-# x = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-# y = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-
 x_train = np.array([1, 2, 3, 4, 5, 6, 7])
 y_train = np.array([1, 2, 3, 4, 5, 6, 7])
 
