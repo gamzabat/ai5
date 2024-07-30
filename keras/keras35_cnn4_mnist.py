@@ -100,7 +100,7 @@ filepath = ''.join([PATH, 'k35_', date, "_", filename])
 mcp = ModelCheckpoint(
     monitor = 'val_loss',
     mode = 'auto',
-    verbose = 0,
+    verbose = 1,
     save_best_only = True,
     filepath = filepath
 )
@@ -108,7 +108,7 @@ mcp = ModelCheckpoint(
 es = EarlyStopping(
     monitor = 'val_loss',
     mode = 'min',
-    patience = 16,
+    patience = 10,
     restore_best_weights = True
 )
 
@@ -141,6 +141,6 @@ print("loss :", loss)
 print("acc :", accuracy_score(y_test.values.argmax(axis = 1), y_pred.argmax(axis = 1)))
 print("fit time", round(end_time - start_time, 2), "초")
 
-# import matplotlib.pyplot as plt
-
-# plt.scatter(np.round(y_pred))
+# loss : [0.042255811393260956, 0.9882000088691711]
+# acc : 0.9882
+# fit time 107.65 초
