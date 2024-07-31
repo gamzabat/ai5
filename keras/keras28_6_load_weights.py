@@ -10,8 +10,7 @@ from keras.layers import Dense
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-from sklearn.preprocessing import MaxAbsScaler, RobustScaler
+from sklearn.preprocessing import RobustScaler
 
 from sklearn.datasets import load_boston
 
