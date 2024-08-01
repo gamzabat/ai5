@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 
 from tensorflow.keras.datasets import cifar10
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, MaxPooling2D, Input, Dropout
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.utils import to_categorical
 
@@ -45,20 +45,39 @@ y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
 
 #2 model
-model = Sequential()
+# model = Sequential()
 
-model.add(Conv2D(128, (3, 3), input_shape = (32, 32, 3), activation = 'relu', padding = 'same'))
-model.add(Dropout(0.2))
-model.add(Conv2D(128, (3, 3), activation = 'relu', padding = 'same'))
-model.add(MaxPooling2D())
-model.add(Conv2D(128, (2, 2), activation = 'relu', padding = 'same'))
-model.add(Dropout(0.2))
-model.add(Conv2D(128, (2, 2), activation = 'relu', padding = 'same'))
-model.add(MaxPooling2D())
-model.add(Flatten())
-model.add(Dense(128, activation = 'relu'))
-model.add(Dropout(0.2))
-model.add(Dense(10, activation = 'softmax'))
+# model.add(Conv2D(128, (3, 3), input_shape = (32, 32, 3), activation = 'relu', padding = 'same'))
+# model.add(Dropout(0.2))
+# model.add(Conv2D(128, (3, 3), activation = 'relu', padding = 'same'))
+# model.add(MaxPooling2D())
+# model.add(Conv2D(128, (2, 2), activation = 'relu', padding = 'same'))
+# model.add(Dropout(0.2))
+# model.add(Conv2D(128, (2, 2), activation = 'relu', padding = 'same'))
+# model.add(MaxPooling2D())
+
+# model.add(Flatten())
+# model.add(Dense(128, activation = 'relu'))
+# model.add(Dropout(0.2))
+# model.add(Dense(10, activation = 'softmax'))
+
+input1 = Input(shape = (32, 32, 3))
+
+conv2D1 = Conv2D(128, 3, activation = 'relu', padding = 'same')(input1)
+dropout1 = Dropout(0.2)(conv2D1)
+conv2D2 = Conv2D(128, 3, activation = 'relu', padding = 'same')(dropout1)
+maxPooling2D1 = MaxPooling2D()(conv2D2)
+conv2D3 = Conv2D(128, 2, activation = 'relu', padding = 'same')(maxPooling2D1)
+dropout2 = Dropout(0.2)(conv2D3)
+conv2D4 = Conv2D(128, 2, activation = 'relu', padding = 'same')(dropout2)
+maxPooling2D2 = MaxPooling2D()(conv2D4)
+flatten1 = Flatten()(maxPooling2D2)
+dense1 = Dense(128, activation = 'relu')(flatten1)
+dropout3 = Dropout(0.2)(dense1)
+
+output1 = Dense(10, activation = 'softmax')(dropout3)
+
+model = Model(inputs = input1, outputs = output1)
 
 model.summary()
 
@@ -123,11 +142,3 @@ print(y_pred.shape)
 print("loss :", loss)
 print("acc :", accuracy_score(y_test.argmax(axis = 1), y_pred.argmax(axis = 1)))
 print("fit time", round(end_time - start_time, 2), "초")
-
-# loss : [0.9279019236564636, 0.6715999841690063]
-# acc : 0.6716
-# fit time 133.18 초
-
-# loss : [1.5595356225967407, 0.6657000184059143]
-# acc : 0.6657
-# fit time 125.57 초

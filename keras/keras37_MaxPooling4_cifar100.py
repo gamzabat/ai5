@@ -58,16 +58,17 @@ model.add(BatchNormalization())
 model.add(Conv2D(128, (3, 3), activation = 'relu', padding = 'same'))
 model.add(BatchNormalization())
 model.add(Dropout(0.25))
-model.add(Conv2D(128, (2, 2), activation = 'relu', padding = 'same'))
-model.add(MaxPooling2D())
+model.add(Conv2D(64, (2, 2), activation = 'relu', padding = 'same'))
 model.add(BatchNormalization())
-model.add(Conv2D(128, (2, 2), activation = 'relu', padding = 'same'))
+model.add(Dropout(0.25))
+model.add(Conv2D(64, (2, 2), activation = 'relu', padding = 'same'))
 model.add(Dropout(0.25))
 model.add(MaxPooling2D())
 model.add(BatchNormalization())
 model.add(Flatten())
-model.add(Dense(128, activation = 'relu'))
+model.add(Dense(64, activation = 'relu'))
 model.add(BatchNormalization())
+model.add(Dropout(0.25))
 model.add(Dense(100, activation = 'softmax'))
 
 model.summary()
@@ -89,21 +90,21 @@ PATH = './_save/keras37/cifar100/'
 
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
-filepath = ''.join([PATH, 'k35_', date, "_", filename])
+filepath = ''.join([PATH, 'k37_', date, "_", filename])
 ##################### mcp 세이브 파일명 만들기 끝 ###################
 
 mcp = ModelCheckpoint(
-    monitor = 'val_accuracy',
-    mode = 'max',
+    monitor = 'val_loss',
+    mode = 'auto',
     verbose = 1,
     save_best_only = True,
     filepath = filepath
 )
 
 es = EarlyStopping(
-    monitor = 'val_accuracy',
-    mode = 'max',
-    patience = 100,
+    monitor = 'val_loss',
+    mode = 'min',
+    patience = 10,
     restore_best_weights = True
 )
 
@@ -112,7 +113,7 @@ start_time = time.time()
 hist = model.fit(
     x_train,
     y_train,
-    validation_split = 0.1,
+    validation_split = 0.2,
     callbacks = [es, mcp],
     epochs = 2560,
     batch_size = 512,
@@ -125,8 +126,6 @@ end_time = time.time()
 loss = model.evaluate(x_test, y_test, verbose = 0)
 
 y_pred = model.predict(x_test)
-
-print(y_pred)
 
 print(y_pred.shape)
 
@@ -149,6 +148,6 @@ print("fit time", round(end_time - start_time, 2), "초")
 # fit time 73.23 초
 
 # after MaxPooling2D, BatchNormalization
-# loss : [3.349491834640503, 0.5257999897003174]
-# acc : 0.5258
-# fit time 1588.77 초
+# loss : [2.073413848876953, 0.46970000863075256]
+# acc : 0.4697
+# fit time 222.15 초

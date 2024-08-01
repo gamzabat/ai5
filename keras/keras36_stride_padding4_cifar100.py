@@ -91,16 +91,16 @@ filepath = ''.join([PATH, 'k35_', date, "_", filename])
 ##################### mcp 세이브 파일명 만들기 끝 ###################
 
 mcp = ModelCheckpoint(
-    monitor = 'val_accuracy',
-    mode = 'max',
+    monitor = 'val_loss',
+    mode = 'auto',
     verbose = 1,
     save_best_only = True,
     filepath = filepath
 )
 
 es = EarlyStopping(
-    monitor = 'val_accuracy',
-    mode = 'max',
+    monitor = 'val_loss',
+    mode = 'min',
     patience = 16,
     restore_best_weights = True
 )

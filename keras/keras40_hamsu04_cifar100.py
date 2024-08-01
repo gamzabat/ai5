@@ -1,9 +1,9 @@
 import pandas as pd
 import numpy as np
 
-from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.datasets import cifar100
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D, BatchNormalization
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.utils import to_categorical
 
@@ -13,13 +13,13 @@ import time
 import matplotlib.pyplot as plt
 
 #1 data
-(x_train, y_train), (x_test, y_test) = cifar10.load_data()
+(x_train, y_train), (x_test, y_test) = cifar100.load_data()
 
 # np.random.seed(7777)
 
-# class_names = ['apple', 'beaver', 'bottle', 'butterfly', 'castle', 'clock', 'couch', 'leopard', 'rose', 'shark']
-
 # random_idx = np.random.randint(50000, size = 25)
+
+# class_names = ['apple', 'aquarium_fish', 'baby', 'bear', 'beaver', 'bed', 'bee', 'beetle', 'bicycle', 'bottle', 'bowl', 'boy', 'bridge', 'bus', 'butterfly', 'camel', 'can', 'castle', 'caterpillar', 'cattle', 'chair', 'chimpanzee', 'clock', 'cloud', 'cockroach', 'couch', 'crab', 'crocodile', 'cup', 'dinosaur', 'dolphin', 'elephant', 'flatfish', 'forest', 'fox', 'girl', 'hamster', 'house', 'kangaroo', 'keyboard', 'lamp', 'lawn_mower', 'leopard', 'lion', 'lizard', 'lobster', 'man', 'maple_tree', 'motorcycle', 'mountain', 'mouse', 'mushroom', 'oak_tree', 'orange', 'orchid', 'otter', 'palm_tree', 'pear', 'pickup_truck', 'pine_tree', 'plain', 'plate', 'poppy', 'porcupine', 'possum', 'rabbit', 'raccoon', 'ray', 'road', 'rocket', 'rose', 'sea', 'seal', 'shark', 'shrew', 'skunk', 'skyscraper', 'snail', 'snake', 'spider', 'squirrel', 'streetcar', 'sunflower', 'sweet_pepper', 'table', 'tank', 'telephone', 'television', 'tiger', 'tractor', 'train', 'trout', 'tulip', 'turtle', 'wardrobe', 'whale', 'willow_tree', 'wolf', 'woman', 'worm']
 
 # plt.figure(figsize=(5, 5))
 
@@ -30,7 +30,6 @@ import matplotlib.pyplot as plt
 #     plt.yticks([])
 
 #     plt.imshow(x_train[idx], cmap='gray')
-
 #     plt.xlabel(class_names[y_train[idx][0]])
 
 # plt.show()
@@ -38,8 +37,11 @@ import matplotlib.pyplot as plt
 print(x_train.shape, y_train.shape) # (50000, 32, 32) (50000,)
 print(x_test.shape, y_test.shape)   # (10000, 32, 32) (10000,)
 
-x_train = (x_train - 127.5) / 127.5
-x_test = (x_test - 127.5) / 127.5
+x_train = x_train / 255.0
+x_test = x_test / 255.0
+
+# x_train = (x_train - 127.5) / 127.5
+# x_test = (x_test - 127.5) / 127.5
 
 y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
@@ -48,17 +50,26 @@ y_test = to_categorical(y_test)
 model = Sequential()
 
 model.add(Conv2D(128, (3, 3), input_shape = (32, 32, 3), activation = 'relu', padding = 'same'))
-model.add(Dropout(0.2))
+model.add(BatchNormalization())
 model.add(Conv2D(128, (3, 3), activation = 'relu', padding = 'same'))
+model.add(Dropout(0.25))
 model.add(MaxPooling2D())
-model.add(Conv2D(128, (2, 2), activation = 'relu', padding = 'same'))
-model.add(Dropout(0.2))
-model.add(Conv2D(128, (2, 2), activation = 'relu', padding = 'same'))
+model.add(BatchNormalization())
+model.add(Conv2D(128, (3, 3), activation = 'relu', padding = 'same'))
+model.add(BatchNormalization())
+model.add(Dropout(0.25))
+model.add(Conv2D(64, (2, 2), activation = 'relu', padding = 'same'))
+model.add(BatchNormalization())
+model.add(Dropout(0.25))
+model.add(Conv2D(64, (2, 2), activation = 'relu', padding = 'same'))
+model.add(Dropout(0.25))
 model.add(MaxPooling2D())
+model.add(BatchNormalization())
 model.add(Flatten())
-model.add(Dense(128, activation = 'relu'))
-model.add(Dropout(0.2))
-model.add(Dense(10, activation = 'softmax'))
+model.add(Dense(64, activation = 'relu'))
+model.add(BatchNormalization())
+model.add(Dropout(0.25))
+model.add(Dense(100, activation = 'softmax'))
 
 model.summary()
 
@@ -75,11 +86,11 @@ print(type(date)) # <class 'datetime.datetime'>
 
 date = date.strftime("%y%m%d_%H%M%S") # 240726_165505
 
-PATH = './_save/keras35/cifar10/'
+PATH = './_save/keras37/cifar100/'
 
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
-filepath = ''.join([PATH, 'k35_', date, "_", filename])
+filepath = ''.join([PATH, 'k37_', date, "_", filename])
 ##################### mcp 세이브 파일명 만들기 끝 ###################
 
 mcp = ModelCheckpoint(
@@ -93,19 +104,19 @@ mcp = ModelCheckpoint(
 es = EarlyStopping(
     monitor = 'val_loss',
     mode = 'min',
-    patience = 5,
+    patience = 10,
     restore_best_weights = True
 )
 
 start_time = time.time()
 
-model.fit(
+hist = model.fit(
     x_train,
     y_train,
     validation_split = 0.2,
     callbacks = [es, mcp],
     epochs = 2560,
-    batch_size = 128,
+    batch_size = 512,
     verbose = 1
 )
 
@@ -116,18 +127,12 @@ loss = model.evaluate(x_test, y_test, verbose = 0)
 
 y_pred = model.predict(x_test)
 
-print(y_pred)
-
 print(y_pred.shape)
 
 print("loss :", loss)
 print("acc :", accuracy_score(y_test.argmax(axis = 1), y_pred.argmax(axis = 1)))
 print("fit time", round(end_time - start_time, 2), "초")
 
-# loss : [0.9279019236564636, 0.6715999841690063]
-# acc : 0.6716
-# fit time 133.18 초
-
-# loss : [1.5595356225967407, 0.6657000184059143]
-# acc : 0.6657
-# fit time 125.57 초
+# loss : [0.7341353297233582, 0.7508000135421753]
+# acc : 0.7508
+# fit time 63.23 초
