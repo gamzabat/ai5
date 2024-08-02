@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 
 from tensorflow.keras.datasets import cifar100
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D, BatchNormalization
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D, BatchNormalization, Input
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.utils import to_categorical
 
@@ -47,29 +47,56 @@ y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
 
 #2 model
-model = Sequential()
+# model = Sequential()
 
-model.add(Conv2D(128, (3, 3), input_shape = (32, 32, 3), activation = 'relu', padding = 'same'))
-model.add(BatchNormalization())
-model.add(Conv2D(128, (3, 3), activation = 'relu', padding = 'same'))
-model.add(Dropout(0.25))
-model.add(MaxPooling2D())
-model.add(BatchNormalization())
-model.add(Conv2D(128, (3, 3), activation = 'relu', padding = 'same'))
-model.add(BatchNormalization())
-model.add(Dropout(0.25))
-model.add(Conv2D(64, (2, 2), activation = 'relu', padding = 'same'))
-model.add(BatchNormalization())
-model.add(Dropout(0.25))
-model.add(Conv2D(64, (2, 2), activation = 'relu', padding = 'same'))
-model.add(Dropout(0.25))
-model.add(MaxPooling2D())
-model.add(BatchNormalization())
-model.add(Flatten())
-model.add(Dense(64, activation = 'relu'))
-model.add(BatchNormalization())
-model.add(Dropout(0.25))
-model.add(Dense(100, activation = 'softmax'))
+# model.add(Conv2D(128, (3, 3), input_shape = (32, 32, 3), activation = 'relu', padding = 'same'))
+# model.add(BatchNormalization())
+# model.add(Conv2D(128, (3, 3), activation = 'relu', padding = 'same'))
+# model.add(Dropout(0.25))
+# model.add(MaxPooling2D())
+# model.add(BatchNormalization())
+# model.add(Conv2D(128, (3, 3), activation = 'relu', padding = 'same'))
+# model.add(BatchNormalization())
+# model.add(Dropout(0.25))
+# model.add(Conv2D(64, (2, 2), activation = 'relu', padding = 'same'))
+# model.add(BatchNormalization())
+# model.add(Dropout(0.25))
+# model.add(Conv2D(64, (2, 2), activation = 'relu', padding = 'same'))
+# model.add(Dropout(0.25))
+# model.add(MaxPooling2D())
+# model.add(BatchNormalization())
+# model.add(Flatten())
+# model.add(Dense(64, activation = 'relu'))
+# model.add(BatchNormalization())
+# model.add(Dropout(0.25))
+# model.add(Dense(100, activation = 'softmax'))
+
+input1 = Input(shape = (32, 32, 3))
+
+conv2D1 = Conv2D(128, 3, activation = 'relu', padding = 'same')(input1)
+batchNormalization1 = BatchNormalization()(conv2D1)
+conv2D2 = Conv2D(128, 3, activation = 'relu', padding = 'same')(batchNormalization1)
+dropout1 = Dropout(0.25)(conv2D2)
+maxPooling2D1 = MaxPooling2D()(dropout1)
+batchNormalization2 = BatchNormalization()(maxPooling2D1)
+conv2D3 = Conv2D(128, 3, activation = 'relu', padding = 'same')(batchNormalization2)
+batchNormalization3 = BatchNormalization()(conv2D3)
+dropout2 = Dropout(0.25)(batchNormalization3)
+conv2D4 = Conv2D(128, 2, activation = 'relu', padding = 'same')(dropout2)
+batchNormalization4 = BatchNormalization()(conv2D4)
+dropout3 = Dropout(0.25)(batchNormalization4)
+conv2D5 = Conv2D(128, 2, activation = 'relu', padding = 'same')(dropout3)
+dropout4 = Dropout(0.25)(conv2D5)
+maxPooling2D2 = MaxPooling2D()(dropout4)
+batchNormalization5 = BatchNormalization()(maxPooling2D2)
+flatten1 = Flatten()(batchNormalization5)
+dense1 = Dense(128, activation = 'relu')(flatten1)
+batchNormalization6 = BatchNormalization()(dense1)
+dropout5 = Dropout(0.25)(batchNormalization6)
+
+output1 = Dense(10, activation = 'softmax')(dropout5)
+
+model = Model(inputs = input1, outputs = output1)
 
 model.summary()
 
