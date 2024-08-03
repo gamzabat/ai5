@@ -179,18 +179,6 @@ sample_submission_csv['label'] = y_submit
 
 sample_submission_csv.to_csv(PATH_SUBMISSION + "sampleSubmission_" + datetime.datetime.now().strftime("%y%m%d_%H%M%S") + ".csv")
 
-# loss : [0.33697962760925293, 0.8543000221252441]
-# acc : 0.8543
-# fit time 721.47 sec
-
-# loss : [0.49703797698020935, 0.7527247071266174]
-# acc : 0.7527247275272473
-# fit time 4320.38 sec
-
-# loss : [0.48730942606925964, 0.7575333118438721]
-# acc : 0.7575333333333333
-# fit time 1602.58 sec
-
-# loss : [0.5586273074150085, 0.7063000202178955]
-# acc : 0.7063
-# fit time 1027.27 sec
+# after retrain
+# loss : [0.46252983808517456, 0.7623000144958496] -> 0.29466
+# acc : 0.7623
