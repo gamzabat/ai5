@@ -64,7 +64,7 @@ xy_test = test_datagen.flow_from_directory(
     directory = PATH_SUBMIT,
     target_size = (WIDTH, HEIGHT),
     batch_size = 12500,
-    class_mode = None,
+    class_mode = 'binary',
     color_mode = 'rgb',
     shuffle = False
 )
@@ -173,7 +173,7 @@ print("loss :", loss)
 print("acc :", accuracy_score(y_test, np.round(y_pred)))
 print("fit time", round(end_time - start_time, 2), "sec")
 
-y_submit = model.predict(xy_test.next(), batch_size = 16)
+y_submit = model.predict(xy_test[0][0], batch_size = 16)
 
 sample_submission_csv['label'] = y_submit
 
