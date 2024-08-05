@@ -8,7 +8,7 @@ me = np.load(path)
 
 print(me.shape)
 
-model = load_model('./_save/k45_faces.hdf5')
+model = load_model('./_save/k49_faces2.hdf5')
 
 y_submit = model.predict(me)
 

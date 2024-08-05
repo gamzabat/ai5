@@ -22,8 +22,8 @@ CHANNEL = 3
 #1 data
 NP_PATH = "./_data/_save_npy/"
 
-x = np.load(NP_PATH + "keras44_03_x_train.npy")
-y = np.load(NP_PATH + "keras44_03_y_train.npy")
+x = np.load(NP_PATH + "keras45_03_x_train.npy")
+y = np.load(NP_PATH + "keras45_03_y_train.npy")
 
 x_train, x_test, y_train, y_test = train_test_split(
     x,

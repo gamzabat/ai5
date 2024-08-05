@@ -47,8 +47,8 @@ print(lead_time_train)
 
 NP_PATH = "./_data/_save_npy/"
 
-np.save(NP_PATH + 'keras44_03_x_train.npy', arr = xy_train[0][0])
-np.save(NP_PATH + 'keras44_03_y_train.npy', arr = xy_train[0][1])
+np.save(NP_PATH + 'keras45_03_x_train.npy', arr = xy_train[0][0])
+np.save(NP_PATH + 'keras45_03_y_train.npy', arr = xy_train[0][1])
 
 lead_time_test = time.time() - start_time
 
