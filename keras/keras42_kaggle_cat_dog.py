@@ -45,7 +45,7 @@ sample_submission_csv = pd.read_csv(PATH_SUBMISSION + "sample_submission.csv", i
 
 start_time = time.time()
 
-xy_train1 = train_datagen.flow_from_directory(
+xy_train = train_datagen.flow_from_directory(
     PATH_TRAIN,
     target_size = (WIDTH, HEIGHT),
     batch_size = 25000,
@@ -73,8 +73,8 @@ lead_time_test = time.time() - start_time
 
 print(lead_time_test)
 
-x = xy_train1[0][0]
-y = xy_train1[0][1]
+x = xy_train[0][0]
+y = xy_train[0][1]
 
 start_time = time.time()
 
