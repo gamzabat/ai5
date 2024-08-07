@@ -20,7 +20,7 @@ x_test = x_test / 255.
 train_datagen = ImageDataGenerator(
     rescale = 1.0 / 255,
     horizontal_flip = True,        # 수평 뒤집기 = 증폭(완전 다른 데이터가 하나 더 생겼다)
-    vertical_flip = True,         # 수직 뒤집기 = 증폭
+#    vertical_flip = True,         # 수직 뒤집기 = 증폭
     # width_shift_range = 0.1,      # 평행 이동   = 증폭
     # height_shift_range = 0.1,     # 평행 이동 수직
     rotation_range = 15,           # 정해진 각도만큼 이미지 회전

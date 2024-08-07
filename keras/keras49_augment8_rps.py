@@ -167,6 +167,6 @@ print("loss :", loss)
 print("acc :", accuracy_score(y_test, np.round(y_pred)))
 print("fit time", round(end_time - start_time, 2), "sec")
 
-# loss : [0.055220503360033035, 0.9841269850730896]
-# acc : 0.9603174603174603
-# fit time 73.48 sec
+# loss : [5.458277883008122e-07, 1.0]
+# acc : 1.0
+# fit time 118.25 sec
