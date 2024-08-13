@@ -20,7 +20,7 @@ model.add(Dense(1))
 # compile
 model.compile(loss = 'mse', optimizer = 'adam')
 
-model.fit(x_train, y_train, epochs = 1000, batch_size =3)
+model.fit(x_train, y_train, epochs = 1000, batch_size = 3)
 
 # predict
 print("=============================================================")
