@@ -4,13 +4,12 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 
-from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layers import Dense, LSTM, GRU, BatchNormalization, Dropout, Flatten
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-from tensorflow.keras.utils import Sequence
 
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, MaxAbsScaler
+from sklearn.preprocessing import MaxAbsScaler
 from sklearn.metrics import mean_squared_error
 
 from tensorflow.keras.metrics import RootMeanSquaredError
