@@ -8,7 +8,7 @@ import numpy as np
 
 from sklearn.metrics import mean_squared_error
 
-datasets = pd.read_csv(path1 + "jena_cliamte_2009_2016.csv")
+datasets = pd.read_csv(path1 + "jena_climate_2009_2016.csv", index_col = 0)
 
 print(datasets)
 print(datasets.shape)
@@ -18,7 +18,7 @@ y_정답 = datasets.iloc[-144:, 1]
 print(y_정답)
 print(y_정답.shape)
 
-학생꺼 = pd.read_csv(path2 + 학생csv, index_col = 0)
+학생꺼 = pd.read_csv(path2 + "jena.csv", index_col = 0)
 
 print(학생꺼)
 
