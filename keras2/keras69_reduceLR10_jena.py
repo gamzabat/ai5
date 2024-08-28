@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
 
-from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D, BatchNormalization
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D, Input, BatchNormalization
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
@@ -13,8 +15,6 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.decomposition import PCA
 
 import time
-
-import os
 
 import random as rn
 
@@ -25,41 +25,34 @@ rn.seed(337)
 tf.random.set_seed(337)
 np.random.seed(337)
 
-os.environ["TF_GPU_ALLOCATOR"] = "cuda_malloc_async"
-
 WIDTH = 25
 HEIGHT = 25
 
 #1 data
 train_datagen = ImageDataGenerator(
-    rescale = 1. / 255,         # 데이터 스케일링
-    horizontal_flip = True,     # 수평 뒤집기
-    vertical_flip = True,       # 수직 뒤집기
-    width_shift_range = 0.1,    # 10% 수평 이동
-    height_shift_range = 0.1,   # 10% 수직 이동
-    rotation_range = 5,         # 정해진 각도로 회전
-    zoom_range = 1.2,           # 축소 또는 확대
-    shear_range = 0.7,          # 수평으로 찌그러트리기
-    fill_mode = 'nearest'       # 이미지가 이동한 후 남은 공간을 어떻게 채우는가
+    rescale = 1. / 255,           # 데이터 스케일링
+    # horizontal_flip = True,     # 수평 뒤집기
+    # vertical_flip = True,       # 수직 뒤집기
+    # width_shift_range = 0.1,    # 10% 수평 이동
+    # height_shift_range = 0.1,   # 10% 수직 이동
+    # rotation_range = 5,         # 정해진 각도로 회전
+    # zoom_range = 1.2,           # 축소 또는 확대
+    # shear_range = 0.7,          # 수평으로 찌그러트리기
+    # fill_mode = 'nearest'       # 이미지가 이동한 후 남은 공간을 어떻게 채우는가
 )
 
 test_datagen = ImageDataGenerator(
     rescale = 1. / 255,         # 데이터 스케일링
 )
 
-PATH_TRAIN = "./_data/kaggle/cat_dog/train"
-PATH_SUBMIT = "./_data/kaggle/cat_dog/test"
-
-PATH_SUBMISSION = "./_data/kaggle/cat_dog/"
-
-sample_submission_csv = pd.read_csv(PATH_SUBMISSION + "sample_submission.csv", index_col = 0)
+PATH_TRAIN = "./_data/image/horse_human/"
 
 start_time = time.time()
 
 xy_train = train_datagen.flow_from_directory(
     PATH_TRAIN,
     target_size = (WIDTH, HEIGHT),
-    batch_size = 25000,
+    batch_size = 1000,
     class_mode = 'binary',
     color_mode = 'rgb',
     shuffle = True
@@ -71,30 +64,11 @@ print(lead_time_train)
 
 start_time = time.time()
 
-xy_test = test_datagen.flow_from_directory(
-    directory = PATH_SUBMIT,
-    target_size = (WIDTH, HEIGHT),
-    batch_size = 12500,
-    class_mode = 'binary',
-    color_mode = 'rgb',
-    shuffle = False
-)
-
-lead_time_test = time.time() - start_time
-
-print(lead_time_test)
-
-x = xy_train[0][0]
-y = xy_train[0][1]
-
-start_time = time.time()
-
 x_train, x_test, y_train, y_test = train_test_split(
-    x,
-    y,
-    train_size = 0.9,
-    stratify = y,
-    random_state = 7777
+    xy_train[0][0],
+    xy_train[0][1],
+    train_size = 0.8,
+    shuffle = False
 )
 
 lead_time_split = time.time() - start_time
@@ -110,7 +84,7 @@ for learning_rate in lr:
     #2 model
     model = Sequential()
 
-    model.add(Dense(128, input_shape = (25 * 25 * 3, ), activation = 'relu'))
+    model.add(Dense(128, input_shape = (WIDTH * HEIGHT * 3, ), activation = 'relu'))
     model.add(Dense(128, activation = 'relu'))
     model.add(Dropout(0.25))
     model.add(Dense(128, activation = 'relu'))
@@ -119,10 +93,9 @@ for learning_rate in lr:
     model.add(Dropout(0.25))
     model.add(Dense(64, activation = 'relu'))
     model.add(Dropout(0.25))
-    model.add(Dense(64, activation = 'relu'))
+    model.add(Flatten())
     model.add(Dense(64, activation = 'relu'))
     model.add(Dropout(0.25))
-    model.add(Dense(64, activation = 'relu'))
 
     model.add(Dense(1, activation = 'sigmoid'))
 
@@ -134,13 +107,16 @@ for learning_rate in lr:
 
     date = datetime.datetime.now()
 
+    print(date) # 2024-07-26 16:49:36.336699
+    print(type(date)) # <class 'datetime.datetime'>
+
     date = date.strftime("%y%m%d_%H%M%S") # 240726_165505
 
-    PATH = './_save/ml05/kaggle_cat_dog/'
+    PATH = './_save/keras67/imageDataGenerator4/'
 
     filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
-    filepath = ''.join([PATH, 'ml05_', date, "_", filename])
+    filepath = ''.join([PATH, 'k67_', date, "_", filename])
     ##################### mcp 세이브 파일명 만들기 끝 ###################
 
     mcp = ModelCheckpoint(
@@ -158,50 +134,69 @@ for learning_rate in lr:
         restore_best_weights = True
     )
 
+    rlr = ReduceLROnPlateau(
+        monitor = 'val_loss',
+        mode = 'auto',
+        patience = 5,
+        verbose = 1,
+        factor = 0.8
+    )
+
     start_time = time.time()
 
     model.fit(
         x_train,
         y_train,
-        validation_split = 0.1,
-        callbacks = [es, mcp],
-        epochs = 512,
-        batch_size = 64,
+        validation_split = 0.25,
+        callbacks = [es, mcp, rlr],
+        epochs = 2560,
+        batch_size = 32,
         verbose = 1
     )
 
     end_time = time.time()
 
     #4 predict
-    loss = model.evaluate(x_test, y_test, verbose = 0, batch_size = 16)
+    loss = model.evaluate(x_test, y_test, verbose = 0)
 
-    y_pred = model.predict(x_test, batch_size = 16)
+    y_pred = model.predict(x_test)
 
     print("lead split time :", lead_time_split)
-    print("lr: {0}, loss :{1}".format(learning_rate, loss))
+    print("rl: {0}, loss :{1}".format(learning_rate, loss))
     print("acc :", accuracy_score(y_test, np.round(y_pred)))
-    print("fit time", round(end_time - start_time, 2), "sec")
+    print("fit time", round(end_time - start_time, 2), "초")
 
-# y_submit = model.predict(xy_test[0][0], batch_size = 16)
+# lead split time : 4.832361936569214
+# loss : [0.011994075961411, 0.9950000047683716]
+# acc : 0.995
+# fit time 64.14 초
 
-# sample_submission_csv['label'] = y_submit
-
-# sample_submission_csv.to_csv(PATH_SUBMISSION + "sampleSubmission_" + datetime.datetime.now().strftime("%y%m%d_%H%M%S") + ".csv")
-
-# lr: 0.1, loss :[0.6933776140213013, 0.5]
+# lr: 0.1, loss :[0.6932957768440247, 0.5]
 # acc : 0.5
+# rl: 0.1, loss :[0.6880204677581787, 0.5600000023841858]
+# acc : 0.56
 
 # lr: 0.01, loss :[0.693260908126831, 0.5]
 # acc : 0.5
+# rl: 0.01, loss :[0.2293900102376938, 0.8949999809265137]
+# acc : 0.895
 
-# lr: 0.005, loss :[0.6933416724205017, 0.5]
+# lr: 0.005, loss :[0.6932452321052551, 0.5]
 # acc : 0.5
+# rl: 0.005, loss :[0.19588381052017212, 0.9350000023841858]
+# acc : 0.935
 
-# lr: 0.001, loss :[0.6750475764274597, 0.5748000144958496]
-# acc : 0.5748
+# lr: 0.001, loss :[0.6848092675209045, 0.5608000159263611]
+# acc : 0.5608
+# rl: 0.001, loss :[0.21058742702007294, 0.925000011920929]
+# acc : 0.925
 
-# lr: 0.0005, loss :[0.6712384819984436, 0.5748000144958496]
-# acc : 0.5748
+# lr: 0.0005, loss :[0.6735682487487793, 0.5659999847412109]
+# acc : 0.566
+# rl: 0.0005, loss :[0.24089622497558594, 0.9350000023841858]
+# acc : 0.935
 
-# lr: 0.0001, loss :[0.6719509959220886, 0.5839999914169312]
-# acc : 0.584
+# lr: 0.0001, loss :[0.671410322189331, 0.5771999955177307]
+# acc : 0.5772
+# rl: 0.0001, loss :[0.21401365101337433, 0.9399999976158142]
+# acc : 0.94

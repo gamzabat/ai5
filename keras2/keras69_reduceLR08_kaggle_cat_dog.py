@@ -3,7 +3,7 @@ import numpy as np
 
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D, BatchNormalization
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
@@ -158,13 +158,21 @@ for learning_rate in lr:
         restore_best_weights = True
     )
 
+    rlr = ReduceLROnPlateau(
+        monitor = 'val_loss',
+        mode = 'auto',
+        patience = 5,
+        verbose = 1,
+        factor = 0.8
+    )
+
     start_time = time.time()
 
     model.fit(
         x_train,
         y_train,
         validation_split = 0.1,
-        callbacks = [es, mcp],
+        callbacks = [es, mcp, rlr],
         epochs = 512,
         batch_size = 64,
         verbose = 1
@@ -178,7 +186,7 @@ for learning_rate in lr:
     y_pred = model.predict(x_test, batch_size = 16)
 
     print("lead split time :", lead_time_split)
-    print("lr: {0}, loss :{1}".format(learning_rate, loss))
+    print("rl: {0}, loss :{1}".format(learning_rate, loss))
     print("acc :", accuracy_score(y_test, np.round(y_pred)))
     print("fit time", round(end_time - start_time, 2), "sec")
 
@@ -190,18 +198,30 @@ for learning_rate in lr:
 
 # lr: 0.1, loss :[0.6933776140213013, 0.5]
 # acc : 0.5
+# rl: 0.1, loss :[0.6931486129760742, 0.5]
+# acc : 0.5
 
 # lr: 0.01, loss :[0.693260908126831, 0.5]
+# acc : 0.5
+# rl: 0.01, loss :[0.6933249235153198, 0.5]
 # acc : 0.5
 
 # lr: 0.005, loss :[0.6933416724205017, 0.5]
 # acc : 0.5
+# rl: 0.005, loss :[0.6932452917098999, 0.5]
+# acc : 0.5
 
 # lr: 0.001, loss :[0.6750475764274597, 0.5748000144958496]
 # acc : 0.5748
+# rl: 0.001, loss :[0.6874405741691589, 0.5479999780654907]
+# acc : 0.548
 
 # lr: 0.0005, loss :[0.6712384819984436, 0.5748000144958496]
 # acc : 0.5748
+# rl: 0.0005, loss :[0.6738184094429016, 0.5555999875068665]
+# acc : 0.5556
 
 # lr: 0.0001, loss :[0.6719509959220886, 0.5839999914169312]
 # acc : 0.584
+# rl: 0.0001, loss :[0.6702492237091064, 0.5807999968528748]
+# acc : 0.5808
